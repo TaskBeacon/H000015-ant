@@ -1,0 +1,308 @@
+# config.yaml
+# === Subject info ===
+subinfo_fields:
+  - name: subject_id
+    type: int
+    constraints:
+      min: 101
+      max: 999
+      digits: 3
+
+
+  - name: subname    
+    type: string
+
+  - name: age 
+    type: int
+    constraints:
+      min: 5
+      max: 60
+
+  - name: gender
+    type: choice
+    choices: [Male, Female]
+
+subinfo_mapping:
+    subject_id: "被试号"
+    subname: "被试姓名(拼音)"
+    age: "年龄"
+    gender: "性别"
+    Male: "男"
+    Female: "女"
+    registration_failed: "注册失败。"
+    registration_successful: "注册成功！"
+    invalid_input: "字段 {field} 输入无效"
+
+
+# === Window settings ===
+window:
+  size: [1920, 1080]
+  units: deg
+  screen: 0
+  bg_color: gray
+  fullscreen: True
+  fullscreen_lock_escape: true
+  monitor_width_cm: 60
+  monitor_distance_cm: 72
+
+# === Task-level settings ===
+task:
+  task_name: "attention_network_test_preview"
+  save_path: ./outputs/human
+  language: "Chinese"
+  voice_name: "zh-CN-YunyangNeural"
+  total_blocks: 1
+  total_trials: 40
+  trial_per_block: 40
+  conditions: [
+    # No Cue
+    'no_cue_congruent_up_left', 'no_cue_congruent_up_right', 'no_cue_incongruent_up_left', 'no_cue_incongruent_up_right',
+    'no_cue_congruent_down_left', 'no_cue_congruent_down_right', 'no_cue_incongruent_down_left', 'no_cue_incongruent_down_right',
+    # Center Cue
+    'center_cue_congruent_up_left', 'center_cue_congruent_up_right', 'center_cue_incongruent_up_left', 'center_cue_incongruent_up_right',
+    'center_cue_congruent_down_left', 'center_cue_congruent_down_right', 'center_cue_incongruent_down_left', 'center_cue_incongruent_down_right',
+    # Double Cue
+    'double_cue_congruent_up_left', 'double_cue_congruent_up_right', 'double_cue_incongruent_up_left', 'double_cue_incongruent_up_right',
+    'double_cue_congruent_down_left', 'double_cue_congruent_down_right', 'double_cue_incongruent_down_left', 'double_cue_incongruent_down_right',
+    # Spatial Cue (Congruent)
+    'spatial_cue_up_congruent_up_left', 'spatial_cue_up_congruent_up_right', 'spatial_cue_up_incongruent_up_left', 'spatial_cue_up_incongruent_up_right',
+    'spatial_cue_down_congruent_down_left', 'spatial_cue_down_congruent_down_right', 'spatial_cue_down_incongruent_down_left', 'spatial_cue_down_incongruent_down_right',
+    # Spatial Cue (Incongruent)
+    'spatial_cue_up_congruent_down_left', 'spatial_cue_up_congruent_down_right', 'spatial_cue_up_incongruent_down_left', 'spatial_cue_up_incongruent_down_right',
+    'spatial_cue_down_congruent_up_left', 'spatial_cue_down_congruent_up_right', 'spatial_cue_down_incongruent_up_left', 'spatial_cue_down_incongruent_up_right'
+  ]
+  key_list: [f, j]
+  left_key: f
+  right_key: j
+  delta: 0.0
+  voice_enabled: true
+  seed_mode: "same_across_sub"
+  overall_seed: 2025
+  input_mode: keyboard
+  hide_cursor: true
+  force_quit_enabled: true
+  force_quit_shortcut: ctrl+q
+
+# === Stimuli ===
+stimuli:
+  fixation:
+    type: text
+    text: "+"
+    color: white
+    height: 1.5
+
+  cue_up:
+    type: text
+    text: "*"
+    color: white
+    height: 1.5
+    pos: [0, 3]
+  cue_down:
+    type: text
+    text: "*"
+    color: white
+    height: 1.5
+    pos: [0, -3]
+  cue_center:
+    type: text
+    text: "*"
+    color: white
+    height: 1.5
+    pos: [0, 0]
+
+  congruent_up_left:
+    type: text
+    text: "<<<<<"
+    color: white
+    height: 1.5
+    pos: [0, 3]
+  congruent_up_right:
+    type: text
+    text: ">>>>>"
+    color: white
+    height: 1.5
+    pos: [0, 3]
+  incongruent_up_left:
+    type: text
+    text: ">><>>"
+    color: white
+    height: 1.5
+    pos: [0, 3]
+  incongruent_up_right:
+    type: text
+    text: "<<><<"
+    color: white
+    height: 1.5
+    pos: [0, 3]
+  congruent_down_left:
+    type: text
+    text: "<<<<<"
+    color: white
+    height: 1.5
+    pos: [0, -3]
+  congruent_down_right:
+    type: text
+    text: ">>>>>"
+    color: white
+    height: 1.5
+    pos: [0, -3]
+  incongruent_down_left:
+    type: text
+    text: ">><>>"
+    color: white
+    height: 1.5
+    pos: [0, -3]
+  incongruent_down_right:
+    type: text
+    text: "<<><<"
+    color: white
+    height: 1.5
+    pos: [0, -3]
+
+  correct_feedback:
+    type: text
+    text: "正确"
+    color: "white"
+    font: SimHei
+    height: 1.5
+  incorrect_feedback:
+    type: text
+    text: "错误"
+    color: "white"
+    font: SimHei
+    height: 1.5
+  no_response_feedback:
+    type: text
+    text: "未反应"
+    color: "white"
+    font: SimHei
+    height: 1.5
+
+  block_break:
+    type: text
+    text: |
+      第 {block_num} / {total_blocks} 部分完成
+      正确率：{accuracy:.2%}
+      
+      请在充分休息后按【空格键】继续
+    color: white
+    height: 1.5
+
+  instruction_text:
+    type: textbox
+    text: |
+      【注意网络任务】
+      
+      任务开始后，屏幕中央会显示一个“+”号，请注视它。
+      有时“+”号前会出现一个“*”作为提示。
+      随后，会出现一排箭头（例如 >>>>> 或 >><>>）。
+      请您尽快判断中间箭头的朝向。
+      
+      如果中间箭头朝向左（<），请按【f】方向键。
+      如果中间箭头朝向右（>），请按【j】方向键。
+      
+      请只关注中间的箭头，忽略两边的箭头。
+      
+      准备好后，请按【空格键】开始。
+    color: white
+    font: SimHei
+    alignment: center
+    letterHeight: 0.78
+    units: deg
+    size: [20, 5]
+
+  good_bye:
+    type: text
+    text: "实验结束，感谢您的参与！"
+    color: white
+    height: 1.5
+
+# === Timing ===
+timing:
+  iti_duration: [0.8, 1.2] # Inter-trial interval (randomized)
+  # === Duration settings ===
+  cue_duration: 0.1
+  fixation_duration: 0.5
+  stim_duration: 1.0  # Max time for response
+  feedback_duration: 0.5
+
+# === Triggers ===
+triggers:
+  map:
+    exp_onset: 254
+    exp_end: 255
+
+    block_onset: 252
+    block_end: 253
+
+    fixation_onset: 1
+
+    # Cue Onset Triggers
+    center_cue_onset: 11
+    double_cue_onset: 12
+    spatial_cue_up_onset: 13
+    spatial_cue_down_onset: 14
+
+    # Stimulus Onset Triggers (C = Cue, F = Flanker, P = Position, D = Direction)
+    # No Cue (C=1)
+    stim_1111: 21 # NoCue, Congruent, Up, Left
+    stim_1112: 22 # NoCue, Congruent, Up, Right
+    stim_1121: 23 # NoCue, Congruent, Down, Left
+    stim_1122: 24 # NoCue, Congruent, Down, Right
+    stim_1211: 25 # NoCue, Incongruent, Up, Left
+    stim_1212: 26 # NoCue, Incongruent, Up, Right
+    stim_1221: 27 # NoCue, Incongruent, Down, Left
+    stim_1222: 28 # NoCue, Incongruent, Down, Right
+
+    # Center Cue (C=2)
+    stim_2111: 31 # CenterCue, Congruent, Up, Left
+    stim_2112: 32 # CenterCue, Congruent, Up, Right
+    stim_2121: 33 # CenterCue, Congruent, Down, Left
+    stim_2122: 34 # CenterCue, Congruent, Down, Right
+    stim_2211: 35 # CenterCue, Incongruent, Up, Left
+    stim_2212: 36 # CenterCue, Incongruent, Up, Right
+    stim_2221: 37 # CenterCue, Incongruent, Down, Left
+    stim_2222: 38 # CenterCue, Incongruent, Down, Right
+
+    # Double Cue (C=3)
+    stim_3111: 41 # DoubleCue, Congruent, Up, Left
+    stim_3112: 42 # DoubleCue, Congruent, Up, Right
+    stim_3121: 43 # DoubleCue, Congruent, Down, Left
+    stim_3122: 44 # DoubleCue, Congruent, Down, Right
+    stim_3211: 45 # DoubleCue, Incongruent, Up, Left
+    stim_3212: 46 # DoubleCue, Incongruent, Up, Right
+    stim_3221: 47 # DoubleCue, Incongruent, Down, Left
+    stim_3222: 48 # DoubleCue, Incongruent, Down, Right
+
+    # Spatial Cue (C=4)
+    stim_4111: 51 # SpatialCue, Congruent, Up, Left
+    stim_4112: 52 # SpatialCue, Congruent, Up, Right
+    stim_4121: 53 # SpatialCue, Congruent, Down, Left
+    stim_4122: 54 # SpatialCue, Congruent, Down, Right
+    stim_4211: 55 # SpatialCue, Incongruent, Up, Left
+    stim_4212: 56 # SpatialCue, Incongruent, Up, Right
+    stim_4221: 57 # SpatialCue, Incongruent, Down, Left
+    stim_4222: 58 # SpatialCue, Incongruent, Down, Right
+
+    # Response Triggers
+    left_key_press: 201
+    right_key_press: 202
+
+    # Feedback Triggers
+    feedback_correct_response: 221
+    feedback_incorrect_response: 222
+    feedback_no_response: 223
+    feedback_onset: 230
+
+  driver:
+    type: serial_url
+    url: loop://
+    baudrate: 115200
+    timeout: 1
+    prefix: [1, 225, 1, 0]
+
+  policy:
+    strict: false
+
+  timing:
+    post_delay_s: 0.001
