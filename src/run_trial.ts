@@ -31,6 +31,18 @@ function resolveFeedbackLabel(
   return "no_response_feedback";
 }
 
+function resolveFeedbackTrigger(snapshot: TrialSnapshot, triggers: Record<string, unknown>): number | null {
+  const label = resolveFeedbackLabel(snapshot);
+  const triggerName =
+    label === "correct_feedback"
+      ? "feedback_correct_response"
+      : label === "incorrect_feedback"
+        ? "feedback_incorrect_response"
+        : "feedback_no_response";
+  const value = Number(triggers[triggerName]);
+  return Number.isFinite(value) ? value : null;
+}
+
 export function run_trial(
   trial: TrialBuilder,
   condition: string,
@@ -54,6 +66,10 @@ export function run_trial(
   const correct_response = target_direction === "left" ? left_key : right_key;
   const stim_name = `${flanker_type}_${target_position}_${target_direction}`;
   const trigger_map = (settings.triggers ?? {}) as Record<string, unknown>;
+  const trigger = (name: string): number | null => {
+    const value = Number(trigger_map[name]);
+    return Number.isFinite(value) ? value : null;
+  };
 
   const fixationUnit = trial.unit("fixation").addStim(stimBank.get("fixation"));
   set_trial_context(fixationUnit, {
@@ -70,16 +86,30 @@ export function run_trial(
     },
     stim_id: "fixation"
   });
-  fixationUnit.show({ duration: Number(settings.fixation_duration ?? 0.5) }).to_dict();
+  fixationUnit
+    .show({
+      duration: Number(settings.fixation_duration ?? 0.5),
+      onset_trigger: trigger("fixation_onset")
+    })
+    .to_dict();
 
   if (cue_type !== "no_cue") {
     const cueUnit = trial.unit("cue");
+    let cueStimId = cue_type;
+    let cueTriggerName = `${cue_type}_onset`;
     if (cue_type === "center_cue") {
       cueUnit.addStim(stimBank.get("cue_center"));
+      cueStimId = "cue_center";
+      cueTriggerName = "center_cue_onset";
     } else if (cue_type === "double_cue") {
       cueUnit.addStim(stimBank.get("cue_up")).addStim(stimBank.get("cue_down"));
+      cueStimId = "cue_double";
+      cueTriggerName = "double_cue_onset";
     } else if (cue_type === "spatial_cue_up" || cue_type === "spatial_cue_down") {
-      cueUnit.addStim(stimBank.get(cue_type === "spatial_cue_up" ? "cue_up" : "cue_down"));
+      const cuePosition = cue_type === "spatial_cue_up" ? "up" : "down";
+      cueUnit.addStim(stimBank.get(`cue_${cuePosition}`));
+      cueStimId = `cue_${cuePosition}`;
+      cueTriggerName = `spatial_cue_${cuePosition}_onset`;
     }
     set_trial_context(cueUnit, {
       trial_id: trial.trial_id,
@@ -94,9 +124,14 @@ export function run_trial(
         cue_type,
         block_idx
       },
-      stim_id: cue_type
+      stim_id: cueStimId
     });
-    cueUnit.show({ duration: Number(settings.cue_duration ?? 0.1) }).to_dict();
+    cueUnit
+      .show({
+        duration: Number(settings.cue_duration ?? 0.1),
+        onset_trigger: trigger(cueTriggerName)
+      })
+      .to_dict();
   }
 
   const stimulusUnit = trial.unit("stimulus").addStim(stimBank.get(stim_name));
@@ -129,6 +164,7 @@ export function run_trial(
       keys: key_list,
       correct_keys: [correct_response],
       duration: Number(settings.stim_duration ?? 1),
+      onset_trigger: stim_trigger,
       response_trigger: {
         [left_key]: Number(trigger_map.left_key_press ?? 201),
         [right_key]: Number(trigger_map.right_key_press ?? 202)
@@ -144,30 +180,47 @@ export function run_trial(
     trial_id: trial.trial_id,
     phase: "feedback",
     deadline_s: Number(settings.feedback_duration ?? 0.5),
-    valid_keys: [...key_list],
+    valid_keys: [],
     block_id,
     condition_id,
     task_factors: {
       condition: condition_id,
       stage: "feedback",
+      cue_type,
+      flanker_type,
+      target_position,
+      target_direction,
+      hit: (snapshot: TrialSnapshot) => Boolean(snapshot.units.stimulus?.hit),
+      response_made: (snapshot: TrialSnapshot) => Boolean(snapshot.units.stimulus?.response),
       block_idx
-    }
+    },
+    stim_id: (snapshot: TrialSnapshot) => resolveFeedbackLabel(snapshot)
   });
-  feedbackUnit.show({ duration: Number(settings.feedback_duration ?? 0.5) }).to_dict();
+  feedbackUnit
+    .show({
+      duration: Number(settings.feedback_duration ?? 0.5),
+      onset_trigger: (snapshot: TrialSnapshot) => resolveFeedbackTrigger(snapshot, trigger_map)
+    })
+    .to_dict();
 
   const itiUnit = trial.unit("iti");
   set_trial_context(itiUnit, {
     trial_id: trial.trial_id,
-    phase: "inter_trial_interval",
+    phase: "iti",
     deadline_s: (settings.iti_duration as number | number[] | null | undefined) ?? null,
-    valid_keys: [...key_list],
+    valid_keys: [],
     block_id,
     condition_id,
     task_factors: {
       condition: condition_id,
-      stage: "inter_trial_interval",
+      stage: "iti",
+      cue_type,
+      flanker_type,
+      target_position,
+      target_direction,
       block_idx
-    }
+    },
+    stim_id: "blank_iti"
   });
   itiUnit.show({ duration: (settings.iti_duration as number | number[] | null | undefined) ?? null }).to_dict();
 
